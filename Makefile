@@ -1,4 +1,4 @@
-NAME:=rapids-ops-cli
+NAME:=roc
 VERSION:="DEV"
 OS:=linux
 DATE:="$(shell date +%F)"
@@ -37,4 +37,7 @@ coverage:
 	go tool cover -html=coverage.out
 	@rm coverage.out
 
-.PHONY: install test
+clean:
+	@rm -r $(BINPATH)
+
+.PHONY: clean install test coverage lint fmt

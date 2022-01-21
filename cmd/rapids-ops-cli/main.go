@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	PROGNAME     = "rapids-ops-cli"
+	PROGNAME     = "roc"
 	RAPIDSAI_ORG = "rapidsai"
 )
 
