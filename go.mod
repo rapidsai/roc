@@ -1,4 +1,4 @@
-module github.com/rapidsai/rapids-ops-cli
+module github.com/rapidsai/roc
 
 go 1.17
 

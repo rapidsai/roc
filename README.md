@@ -1,13 +1,14 @@
-# rapids-ops-cli
+# roc
+## rapids-ops-cli
 
-This is a command-line tool for the RAPIDS Ops team. It helps to add a bit of automation and convenience to routine manual tasks related to the [RAPIDSAI GitHub org](https://github.com/rapidsai/).
+`roc` (rapids-ops-cli) is a command-line tool for the RAPIDS Ops team to add a bit of automation and convenience to routine manual tasks related to the [RAPIDSAI GitHub org](https://github.com/rapidsai/).
 
 The subcommands that are currently supported are:
 * prcommitmsg: Formats a commit message according to the style set in the [ops-bot](https://github.com/rapidsai/ops-bot) AutoMerger
 
   Example usage:
   ```
-  $ rapids-ops-cli prcommitmsg cudf 10008
+  $ roc prcommitmsg cudf 10008
   This PR replaces custom CUDA bindings that are provided by RMM, with official CUDA Python bindings. This PR should be merged after the RMM PR  https://github.com/rapidsai/rmm/pull/930
   
   Authors:
@@ -29,7 +30,7 @@ Since this tool is intended to be used with the `gh` cli tool, it relies on the 
 The code is structured like a typical modern Go project:
 ```
 ├── cmd
-│   └── rapids-ops-cli
+│   └── roc
 │       ├── formatPRCommitMessage.go
 │       └── main.go
 ├── internal
@@ -40,6 +41,7 @@ The code is structured like a typical modern Go project:
 └── pkg
     └── github
         ├── commitmessage.go
+        ├── commitmessage_test.go
         └── github.go
 ```
 
@@ -47,12 +49,11 @@ The project uses [Cobra](https://github.com/spf13/cobra) and [Viper](https://git
 
 #### Commands
 
-`cmd` contains the command-line tool `rapids-ops-cli`. If it makes sense to house different cli tools within this code base, they can be added as new directories under `cmd`.
+`cmd` contains the command-line tool `roc`. If it makes sense to house different cli tools within this code base, they can be added as new directories under `cmd`.
 
 #### Internal helper libraries
 
 `internal` contains some internal utilities that shouldn't be consumed by outside users. For example, the `ghcli` package consists of code copied from the `internal` space of the official [`gh cli`](https://github.com/cli/cli/tree/0607ce56c5eb7edd1a50872fb364a11b52930c39/internal) to copy its behaviors (e.g. config paths).
-
 
 #### External helper libraries
 

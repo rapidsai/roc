@@ -7,8 +7,8 @@ import (
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/cli"
 	"github.com/apex/log/handlers/text"
-	"github.com/rapidsai/rapids-ops-cli/internal/build"
-	"github.com/rapidsai/rapids-ops-cli/internal/ghcli"
+	"github.com/rapidsai/roc/internal/build"
+	"github.com/rapidsai/roc/internal/ghcli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -27,7 +27,7 @@ var (
 		Long: `This tool adds some convenient commands for RAPIDS Ops admins to
 do some routine tasks on GitHub.
 
-Read more at https://github.com/rapidsai/rapids-ops-cli`,
+Read more at https://github.com/rapidsai/roc`,
 	}
 )
 

@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/apex/log"
-	"github.com/rapidsai/rapids-ops-cli/pkg/github"
+	"github.com/rapidsai/roc/pkg/github"
 	"github.com/spf13/cobra"
 )
 
