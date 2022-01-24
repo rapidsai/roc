@@ -3,7 +3,7 @@
 
 `roc` (rapids-ops-cli) is a command-line tool for the RAPIDS Ops team to add a bit of automation and convenience to routine manual tasks related to the [RAPIDSAI GitHub org](https://github.com/rapidsai/).
 
-The subcommands that are currently supported are:
+The subcommands that are currently implemented are:
 * prcommitmsg: Formats a commit message according to the style set in the [ops-bot](https://github.com/rapidsai/ops-bot) AutoMerger
 
   Example usage:
@@ -21,9 +21,9 @@ The subcommands that are currently supported are:
 
 ### Authentication with GitHub
 
-Since this tool is intended to be used with the `gh` cli tool, it relies on the user setting up and authenticating with `gh`.
+This tool authentications with an Oauth flow similar to [`gh`](https://github.com/cli/cli) and [`r3`](https://github.com/adjschmidt8/r3). When using the tool for the first time, it will launch your browser and make you follow an interactive authentication procedure:
 
-`rapids-ops-cli` uses the same oauth token as `gh` by reading its config file (`~/.config/hosts.yml` on Linux; the path may differ on other platforms, and `rapids-ops-cli` checks the same paths as `gh`).
+<img src=".github/oauth-flow.png" width="50%">
 
 ### Code structure
 
@@ -53,7 +53,7 @@ The project uses [Cobra](https://github.com/spf13/cobra) and [Viper](https://git
 
 #### Internal helper libraries
 
-`internal` contains some internal utilities that shouldn't be consumed by outside users. For example, the `ghcli` package consists of code copied from the `internal` space of the official [`gh cli`](https://github.com/cli/cli/tree/0607ce56c5eb7edd1a50872fb364a11b52930c39/internal) to copy its behaviors (e.g. config paths).
+`internal` contains some internal utilities that shouldn't be consumed by outside users, e.g. build-time variables for exposing the version and build time.
 
 #### External helper libraries
 
@@ -62,8 +62,6 @@ The project uses [Cobra](https://github.com/spf13/cobra) and [Viper](https://git
 ### TODOs
 
 This project is fresh and needs the following:
-* Proper versioning using git tags or some other mechanism
-* Tests, tests, tests
+* Proper versioning using git tags or some other mechanism (after the first commit merge)
 * CI/CD and releases uploaded somewhere (S3? GitHub releases?) to be easily downloaded by RAPIDS Ops
 * Compilation for OSX and/or Windows (depending on how confident we are that RAPIDS Ops uses primarily Linux, this may be less important)
-* Code structure review (structs, singletons, pointers, function signatures, packages, etc.)

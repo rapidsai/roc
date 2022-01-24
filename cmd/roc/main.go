@@ -1,21 +1,26 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/cli"
 	"github.com/apex/log/handlers/text"
+	"github.com/cli/oauth"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rapidsai/roc/internal/build"
-	"github.com/rapidsai/roc/internal/ghcli"
+	"github.com/rapidsai/roc/pkg/github"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 const (
-	PROGNAME     = "roc"
-	RAPIDSAI_ORG = "rapidsai"
+	PROGNAME        = "roc"
+	RAPIDSAI_ORG    = "rapidsai"
+	ROC_CONFIG_NAME = ".roc"
 )
 
 var (
@@ -47,17 +52,47 @@ func init() {
 }
 
 func initConfig() {
-	// Get the ghcli config file
-	configPath := ghcli.GetGHCliConfigPath()
+	home, err := homedir.Dir()
+	cobra.CheckErr(err)
 
-	viper.AddConfigPath(configPath)
-
-	// gh cli stores the oauth key in hosts.yml
-	viper.SetConfigName("hosts")
+	viper.AddConfigPath(home)
+	viper.SetConfigName(ROC_CONFIG_NAME)
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Couldn't find `gh` config file: please set up gh cli first")
+		file, err := os.Create(filepath.Join(home, fmt.Sprintf("%s.yml", ROC_CONFIG_NAME)))
+		cobra.CheckErr(err)
+
+		err = file.Chmod(0644)
+		cobra.CheckErr(err)
+
+		fmt.Println("Please authenticate yourself with GitHub")
+		flow := &oauth.Flow{
+			Hostname: "github.com",
+			ClientID: "a1414cacc50a4d34227c",
+			Scopes:   []string{"repo", "user"},
+		}
+
+		githubToken, err := flow.DetectFlow()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Authentication success!")
+		viper.Set("gh_token", githubToken.Token)
+		err = viper.WriteConfig()
+		cobra.CheckErr(err)
+
+		ctx := context.TODO()
+		client := github.GetGitHubClient(ctx)
+
+		user, _, err := client.Users.Get(ctx, "")
+		if err != nil {
+			panic(err)
+		}
+
+		viper.Set("gh_username", user.GetLogin())
+		err = viper.WriteConfig()
+		cobra.CheckErr(err)
 	}
 
 	viper.AutomaticEnv()

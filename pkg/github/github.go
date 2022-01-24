@@ -10,41 +10,19 @@ import (
 )
 
 func getGHOauthToken() string {
-	// Using ~/.config/gh/hosts.yml
-	ghcomVars := viper.Get("github.com")
+	ghOauthToken, ok := viper.Get("gh_token").(string)
 
-	ghcomVarsMap := ghcomVars.(map[string]interface{})
-
-	ghUser := ""
-	ghOauthToken := ""
-	var ok bool
-
-	for key, value := range ghcomVarsMap {
-		switch key {
-		case "user":
-			ghUser, ok = value.(string)
-			if !ok {
-				log.Fatal("expected gh cli config 'user' key to be a string")
-			}
-			continue
-		case "oauth_token":
-			ghOauthToken, ok = value.(string)
-			if !ok {
-				log.Fatal("expected gh cli config 'oauth_token' key to be a string")
-			}
-			continue
-		}
+	if !ok || ghOauthToken == "" {
+		log.Fatal("roc config file didn't contain valid GitHub oauth token")
 	}
 
-	if ghUser == "" || ghOauthToken == "" {
-		log.Fatal("gh cli config file didn't contain GitHub user or oauth token")
-	}
+	ghUser := viper.Get("gh_username")
 
-	log.Debugf("using GitHub username and token %s %s", ghUser, ghOauthToken)
+	log.Debugf("using GitHub token '%s' for user '%s'", ghOauthToken, ghUser)
 	return ghOauthToken
 }
 
-func GetGHClient(ctx context.Context) *github.Client {
+func GetGitHubClient(ctx context.Context) *github.Client {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: getGHOauthToken()},
 	)

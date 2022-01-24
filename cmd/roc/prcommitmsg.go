@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var formatPRCommitMessageCmd = &cobra.Command{
+var PRCommitMsgCmd = &cobra.Command{
 	Use:   "prcommitmsg rapidsai-repo-name pr-number",
 	Short: "Format a commit message for a PR in a rapidsai GitHub repo",
 	Args:  cobra.ExactArgs(2),
@@ -19,14 +19,14 @@ a pull request. It is meant to help RAPIDS Ops members force-merge PRs that
 are failing their status checks.
 
 It formats commit messages similar to how ops-bot does in its auto-merge.`,
-	Run: runFormatCommitMessage,
+	Run: runPRCommitMsgCmd,
 }
 
 func init() {
-	rootCmd.AddCommand(formatPRCommitMessageCmd)
+	rootCmd.AddCommand(PRCommitMsgCmd)
 }
 
-func runFormatCommitMessage(cmd *cobra.Command, args []string) {
+func runPRCommitMsgCmd(cmd *cobra.Command, args []string) {
 	repo := args[0]
 
 	prnum, err := strconv.Atoi(args[1])
@@ -37,7 +37,7 @@ func runFormatCommitMessage(cmd *cobra.Command, args []string) {
 	log.Debugf("looking up pr %d in repo %s...", prnum, repo)
 
 	ctx := context.Background()
-	ghcli := github.GetGHClient(ctx)
+	ghcli := github.GetGitHubClient(ctx)
 
 	commitMessage := github.FormatCommitMessageForPR(ghcli, ctx, RAPIDSAI_ORG, repo, prnum)
 
