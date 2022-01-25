@@ -4,8 +4,7 @@ OS:=linux
 DATE:="$(shell date +%F)"
 ARCH:=amd64
 SOURCE_FILES:=$$(find . -name '*.go' | grep -v vendor)
-#BUILD_FLAGS:=-mod=vendor -a -tags netgo
-BUILD_FLAGS:= -a -tags netgo
+BUILD_FLAGS:=-mod=vendor -a -tags netgo
 BINPATH:=$(PWD)/bin
 
 all: build_roc
