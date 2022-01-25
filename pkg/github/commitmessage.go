@@ -21,14 +21,14 @@ func FormatCommitMessageForPR(ghcli *github.Client, ctx context.Context, org, re
 
 	log.Debugf("formatting commit message for pr: %s", *pr.URL)
 
-	if pr.Body == nil {
-		log.Fatalf("pr #%d on repo '%s/%s' is missing a body or description", prNumber, org, repo)
+	prBody := ""
+
+	if pr.Body != nil {
+		prBody = *pr.Body
+		prBody = strings.TrimSpace(RemoveHTMLComments(prBody))
+		prBody = fmt.Sprintf("%s\n\n", prBody)
 	}
 
-	prBody := *pr.Body
-	prBody = strings.TrimSpace(RemoveHTMLComments(prBody))
-
-	prBody = fmt.Sprintf("%s\n\n", prBody)
 	prBody = fmt.Sprintf("%sAuthors:\n", prBody)
 
 	listOpts := &github.ListOptions{}

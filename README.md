@@ -65,3 +65,4 @@ This project is fresh and needs the following:
 * Proper versioning using git tags or some other mechanism (after the first commit merge)
 * CI/CD and releases uploaded somewhere (S3? GitHub releases?) to be easily downloaded by RAPIDS Ops
 * Compilation for OSX and/or Windows (depending on how confident we are that RAPIDS Ops uses primarily Linux, this may be less important)
+* Look into [goreleaser](https://goreleaser.com/) for a streamlined release process
