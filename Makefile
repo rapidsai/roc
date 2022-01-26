@@ -6,16 +6,39 @@ ARCH:=amd64
 SOURCE_FILES:=$$(find . -name '*.go' | grep -v vendor)
 BUILD_FLAGS:=-mod=vendor -a -tags netgo
 BINPATH:=$(PWD)/bin
+RELEASEPATH:=$(PWD)/release
 
-all: build_roc
+LINUX_AMD64_BIN_NAME:=$(NAME)-linux-amd64
+DARWIN_AMD64_BIN_NAME:=$(NAME)-darwin-amd64
+DARWIN_ARM64_BIN_NAME:=$(NAME)-darwin-arm64
+
+all: build_roc_linux
 
 build_roc:
 	CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) \
 		    go build $(BUILD_FLAGS) \
 		    -ldflags '-w -extldflags "-static" -X github.com/rapidsai/$(NAME)/internal/build.Version=$(VERSION) -X github.com/rapidsai/$(NAME)/internal/build.Date=$(DATE)' \
-		    -o $(BINPATH)/$(NAME) \
+		    -o $(BINPATH)/$(BINNAME) \
 		    ./cmd/$(NAME)
-	strip $(BINPATH)/$(NAME)
+
+build_roc_linux: BINNAME=$(LINUX_AMD64_BIN_NAME)
+build_roc_linux: build_roc
+	strip $(BINPATH)/$(BINNAME)
+
+build_roc_darwin_amd64: BINNAME=$(DARWIN_AMD64_BIN_NAME)
+build_roc_darwin_amd64: OS="darwin"
+build_roc_darwin_amd64: build_roc
+
+build_roc_darwin_arm64: BINNAME=$(DARWIN_ARM64_BIN_NAME)
+build_roc_darwin_arm64: OS="darwin"
+build_roc_darwin_arm64: ARCH="arm64"
+build_roc_darwin_arm64: build_roc
+
+release_zips:
+	@mkdir -p $(RELEASEPATH)
+	make build_roc_linux && zip $(RELEASEPATH)/roc-linux-amd64.zip $(BINPATH)/$(LINUX_AMD64_BIN_NAME)
+	make build_roc_darwin_amd64 && zip $(RELEASEPATH)/roc-darwin-amd64.zip $(BINPATH)/$(DARWIN_AMD64_BIN_NAME)
+	make build_roc_darwin_arm64 && zip $(RELEASEPATH)/roc-darwin-arm64.zip $(BINPATH)/$(DARWIN_ARM64_BIN_NAME)
 
 test:
 	@go test -v ./pkg/...
@@ -37,6 +60,7 @@ coverage:
 	@rm coverage.out
 
 clean:
-	-rm -r $(BINPATH)
+	-rm -rf $(BINPATH)
+	-rm -rf $(RELEASEPATH)
 
 .PHONY: clean install test coverage lint fmt
