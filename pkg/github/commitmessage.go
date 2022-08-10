@@ -38,22 +38,33 @@ func FormatCommitMessageForPR(ghcli *github.Client, ctx context.Context, org, re
 		log.Fatalf("Error when fetching commits for pr: %s", err.Error())
 	}
 
-	uniqueAuthors := make(map[string]bool)
+	uniqueAuthorsWithGHAccounts := make(map[string]bool)
+	uniqueAuthorsWithoutGHAccounts := make(map[string]bool)
+
 	for _, commit := range commits {
 		commitAuthor := commit.Author
 
-		// I don't know if this nil check works
 		if commitAuthor == nil {
-			fmt.Printf("nil commit author! %+v\n", commit)
-			continue
+			// dig into the nested commit struct
+			nestedCommit := commit.Commit
+			if nestedCommit != nil {
+				nestedCommitAuthor := nestedCommit.Author
+				if nestedCommitAuthor != nil {
+					authorName := fmt.Sprintf("%s (%s)", *nestedCommitAuthor.Name, *nestedCommitAuthor.Email)
+					uniqueAuthorsWithoutGHAccounts[authorName] = true
+				}
+			}
+		} else {
+			uniqueAuthorsWithGHAccounts[*commitAuthor.Login] = true
 		}
-
-		uniqueAuthors[*commitAuthor.Login] = true
 	}
 
-	formattedAuthors := FormatUsers(ghcli, ctx, uniqueAuthors)
+	formattedAuthors := FormatUsers(ghcli, ctx, uniqueAuthorsWithGHAccounts)
 	for _, formattedAuthor := range formattedAuthors {
 		prBody = fmt.Sprintf("%s   - %s\n", prBody, formattedAuthor)
+	}
+	for nongithubAuthor := range uniqueAuthorsWithoutGHAccounts {
+		prBody = fmt.Sprintf("%s   - %s\n", prBody, nongithubAuthor)
 	}
 
 	prBody = fmt.Sprintf("%s\nApprovers:\n", prBody)
