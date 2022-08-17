@@ -15,7 +15,7 @@ DARWIN_ARM64_BIN_NAME:=$(NAME)-darwin-arm64
 all: build_roc_linux
 
 build_roc:
-	CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) \
+	GO111MODULE=on CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) \
 		    go build $(BUILD_FLAGS) \
 		    -ldflags '-w -extldflags "-static" -X github.com/rapidsai/$(NAME)/internal/build.Version=$(VERSION) -X github.com/rapidsai/$(NAME)/internal/build.Date=$(DATE)' \
 		    -o $(BINPATH)/$(BINNAME) \
@@ -36,9 +36,9 @@ build_roc_darwin_arm64: build_roc
 
 release_zips:
 	@mkdir -p $(RELEASEPATH)
-	make build_roc_linux && zip $(RELEASEPATH)/roc-linux-amd64.zip $(BINPATH)/$(LINUX_AMD64_BIN_NAME)
-	make build_roc_darwin_amd64 && zip $(RELEASEPATH)/roc-darwin-amd64.zip $(BINPATH)/$(DARWIN_AMD64_BIN_NAME)
-	make build_roc_darwin_arm64 && zip $(RELEASEPATH)/roc-darwin-arm64.zip $(BINPATH)/$(DARWIN_ARM64_BIN_NAME)
+	make build_roc_linux && zip -j $(RELEASEPATH)/roc-linux-amd64.zip $(BINPATH)/$(LINUX_AMD64_BIN_NAME)
+	make build_roc_darwin_amd64 && zip -j $(RELEASEPATH)/roc-darwin-amd64.zip $(BINPATH)/$(DARWIN_AMD64_BIN_NAME)
+	make build_roc_darwin_arm64 && zip -j $(RELEASEPATH)/roc-darwin-arm64.zip $(BINPATH)/$(DARWIN_ARM64_BIN_NAME)
 
 test:
 	@go test -v ./pkg/...
